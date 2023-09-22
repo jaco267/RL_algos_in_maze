@@ -20,6 +20,7 @@ Q learning fails to learn anything useful
 gumbel muzero can learn something     
 
 ### 5x5 maze  (simple problem)
+network-structure--> [100]*3
 
 ```sh
 python algos/gumbel_zero/main.py  --enable_wandb True --env_config.grid_size 5 --num_simulations 5 --algo gumbel_mu5x5_simu5
@@ -35,8 +36,9 @@ python algos/gumbel_zero/main.py  --enable_wandb True --env_config.grid_size 5 -
 ```
 gumbel muzero with one simution budget (orange) learns significantly slower than q_learnging   
 <img src="assets/simu_3_1.png" alt= “” width="800px" >
-### 7x7 maze  (more difficult problem)
 
+### 7x7 maze  (more difficult problem)
+network-structure--> [100]*5      
 
 ```sh
 python algos/gumbel_zero/main.py  --enable_wandb True --env_config.grid_size 7 --num_hidden_layers 5 --num_simulations 16  --algo gumbel_mu7x7_simu16_net_100x5
@@ -45,8 +47,9 @@ python algos/gumbel_zero/main.py  --enable_wandb True --env_config.grid_size 7 -
 
 python algos/gumbel_zero/main.py  --enable_wandb True --env_config.grid_size 7 --num_hidden_layers 5 --num_simulations 4  --algo gumbel_mu7x7_simu4_net_100x5
 
-
 python algos/q_learn/main.py  --enable_wandb True --env_config.grid_size 7 --n_layers 5  --algo q_learn7x7_net_100x5 
+
+python algos/q_learn/main.py  --enable_wandb True --env_config.grid_size 7 --n_layers 7  --algo q_learn7x7_net_100x7 
 ```
 
 q-learning fails to learn anything useful     
