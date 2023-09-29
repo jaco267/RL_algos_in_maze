@@ -19,7 +19,7 @@ def timestamp():
 def get_logger(config):
     if config.enable_wandb:
         wandb.login()
-        wandb_init(config.project_name,timestamp(),algos_name=config.algo,config=config)
+        wandb_init(config.project_name,timestamp(),algos_name=config.algo_name,config=config)
         logger = wandb
     else:
         logger = void_logger

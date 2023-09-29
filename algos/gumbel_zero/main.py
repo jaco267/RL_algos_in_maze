@@ -24,17 +24,16 @@ def main(config:TrainConfig):
     print(config)
     key = jx.random.PRNGKey(config.seed)
     logger = get_logger(config)
-    class V_function(hk.Module):
+    class P_V_network(hk.Module):
         def __init__(self, config, num_actions, name=None):
             super().__init__(name=name)
-            self.num_hidden_units = config.num_hidden_units     #*200
-            self.num_hidden_layers = config.num_hidden_layers   #*3
+            self.num_hidden_units = config.n_hidden_units     #*200
+            self.num_hidden_layers = config.n_layers   #*3
             self.activation_function = activation_dict[config.activation]  #*elu
             self.num_actions = num_actions
         def __call__(self, obs):  #* forward
             #(5,5,4)  (board_h,board_w,channels)  #channels 0~3 player goal wall empty
-            x = jnp.ravel(obs)
-            # print(x.shape)   #100
+            x = jnp.ravel(obs)  #x.shape 100
             for i in range(self.num_hidden_layers):   #*3
                 x = self.activation_function(hk.Linear(self.num_hidden_units)(x))
             V = hk.Linear(1)(x)[0]  #** last layer    hk.Linear(1)(x) shape = (,)
@@ -78,7 +77,7 @@ def main(config:TrainConfig):
             num_actions = env.num_actions()  #5
             #* agnet nn
             #*  v_net 
-            V_net = hk.without_apply_rng(hk.transform(lambda obs: V_function(config,num_actions)(obs.astype(float))))
+            V_net = hk.without_apply_rng(hk.transform(lambda obs: P_V_network(config,num_actions)(obs.astype(float))))
             key, subkey = jx.random.split(key)
             init_V_params = V_net.init(subkey, dummy_obs)  #V_params = V_function's params (W1,b1,W2,b2...)  #their shape are ckeched  by dummy_obs
             V_func = V_net.apply                #    V_func = V_function(config)
