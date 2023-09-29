@@ -86,7 +86,7 @@ def main(config: TrainConfig):
     # Training
     agent = run(logger,env, agent,key=subkey, ep_steps=config.train_eps, **vars(config))
     # Testing
-    run(logger, env, agent,key=subkey, training=False, ep_steps=config.test_eps, **vars(config) )
+    # run(logger, env, agent,key=subkey, training=False, ep_steps=config.test_eps, **vars(config) )
     logger.finish()
 if __name__ == "__main__":
     main()

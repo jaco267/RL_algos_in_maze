@@ -9,24 +9,23 @@ class EnvConfig:
 @dataclass
 class TrainConfig:
     project_name:str = "jax_maze"  #wandb name
-    algo_name:str="dqn_time"  #wandb runs name
+    algo_name:str="dqn_demo"  #wandb runs name
     seed:int=1
     enable_wandb:bool=False
-    
+
+    ## training 
     batch_size:int=256
     discount_factor:float=0.95
-
+    train_eps:int=1000
+    warm_up_steps:int = 300
+    ## network
     n_layers:int=3
     n_hidden_units:int=100   #32
-    
-    train_eps:int=1000
-    test_eps:int=30
+    ## hyper parameters
     epsilon_hlife:int=1500
-    lr:float=0.03
+    lr:float=0.0001#0.03
     dqnft_update_every:int=100
-    #how often to copy online parameters to target network in DQN with fixed target
-    # environment:str= "ProcMaze"
-    warm_up_steps:int = 300
+    ## plot
+    avg_return_smoothing:float=0.9
+    ## env
     env_config:EnvConfig=EnvConfig
-    avg_return_smoothing:float=0.9## plot
-    # eval_frequency:int=100
