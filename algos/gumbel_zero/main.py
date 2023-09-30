@@ -27,15 +27,15 @@ def main(config:TrainConfig):
     class P_V_network(hk.Module):
         def __init__(self, config, num_actions, name=None):
             super().__init__(name=name)
-            self.num_hidden_units = config.n_hidden_units     #*200
-            self.num_hidden_layers = config.n_layers   #*3
+            self.n_hidden_units = config.n_hidden_units     #*200
+            self.n_layers = config.n_layers   #*3
             self.activation_function = activation_dict[config.activation]  #*elu
             self.num_actions = num_actions
-        def __call__(self, obs):  #* forward
+        def __call__(self, x):  #* forward
             #(5,5,4)  (board_h,board_w,channels)  #channels 0~3 player goal wall empty
-            x = jnp.ravel(obs)  #x.shape 100
-            for i in range(self.num_hidden_layers):   #*3
-                x = self.activation_function(hk.Linear(self.num_hidden_units)(x))
+            x = x.ravel()  #x.shape 100
+            for i in range(self.n_layers):   #*3
+                x = self.activation_function(hk.Linear(self.n_hidden_units)(x))
             V = hk.Linear(1)(x)[0]  #** last layer    hk.Linear(1)(x) shape = (,)
             # V:  last layer output
             pi_logit = hk.Linear(self.num_actions)(x)
@@ -83,10 +83,8 @@ def main(config:TrainConfig):
             V_func = V_net.apply                #    V_func = V_function(config)
 
             #* v_optim
-            opt_v = optax.adamw(learning_rate=config.V_alpha,eps=config.eps_adam, 
-                                    b1=config.b1_adam, b2=config.b2_adam,weight_decay= config.wd_adam)
-            # "V_alpha"  :0.0001,
-            #  "pi_alpha":0.00004,
+            opt_v = optax.adamw(learning_rate=config.lr,eps=config.eps_adam, 
+                        b1=config.b1_adam, b2=config.b2_adam,weight_decay= config.wd_adam)
             V_opt_state = opt_v.init(init_V_params)  #adam's state   m0  v0
             return env_states, V_func, init_V_params,\
                             opt_v,  V_opt_state,

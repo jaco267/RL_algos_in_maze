@@ -21,6 +21,14 @@ gumbel muzero can learn something
 
 ### 5x5 maze  (simple problem)
 network-structure--> [100]*3
+```sh
+## qlearning with default network structure  [100,100,100,action_dim] in 5x5 maze
+python algos/q_learn/main.py  --enable_wandb True --env_config.grid_size 5 --algo q_learn5x5_lay3_hid100
+## muzero
+python algos/gumbel_zero/main.py  --enable_wandb True --env_config.grid_size 5 --num_simulations 3 --algo muzero5x5_simu3_lay3_hid_100
+
+```
+
 
 ```sh
 python algos/gumbel_zero/main.py  --enable_wandb True --env_config.grid_size 5 --num_simulations 5 --algo gumbel_mu5x5_simu5

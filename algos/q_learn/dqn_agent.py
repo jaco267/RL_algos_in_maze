@@ -14,7 +14,7 @@ import jax.numpy as jnp
 import logging
 import optax
 logger = logging.getLogger()
-
+activation_dict = {"relu": jx.nn.relu, "silu": jx.nn.silu, "elu": jx.nn.elu}
 def batch_func(predict_func):
     #                              params observation
     f = vmap(predict_func, in_axes=(None, 0))
@@ -34,17 +34,17 @@ def optim_update(func, params, X, Y, optim=None,optim_state=None):
     params = optax.apply_updates(params,updates)
     return l, params,optim_state#jit(grad_descent, static_argnums=2)(params, grads, step_size)
 class DQN_net(hk.Module):
-    def __init__(self,layer_spec):
+    def __init__(self,config,num_actions):
         super().__init__(name=None)
-        self.layer_spec = layer_spec
+        self.n_hidden_units = config.n_hidden_units     #*100
+        self.n_layers = config.n_layers   #*3
+        self.activation_function = activation_dict[config.activation]  #*elu
+        self.num_actions = num_actions
     def __call__(self, x):
         x = x.ravel()
-        for l in self.layer_spec[1:-1]:
-            w_init=hk.initializers.VarianceScaling(scale=2.0)
-            x = jx.nn.relu(hk.Linear(l, w_init=w_init)(x))
-            # x = jx.nn.relu(hk.Linear(l)(x))
-        w_init=hk.initializers.VarianceScaling(scale=2.0)
-        output = hk.Linear(self.layer_spec[-1],w_init=w_init)(x)
+        for i in range(self.n_layers):   #*3
+            x = self.activation_function(hk.Linear(self.n_hidden_units)(x))
+        output = hk.Linear(self.num_actions)(x)
         return output
 class ReplayBuffer:
     def __init__(self, maxlen, seed=0):
@@ -69,7 +69,7 @@ class ReplayBuffer:
         return len(self.buf)
     
 class DQNAgent():
-    def __init__(self, layer_spec=None,env=None,key=None, lr=0.001, epsilon_hlife=500, epsilon=1, epsilon_min=0.2,
+    def __init__(self, num_actions=None,env=None,key=None,config=None, lr=0.001, epsilon_hlife=500, epsilon=1, epsilon_min=0.2,
          buffer_size=1000000, discount_factor=0.90, seed=0, **kwargs,):
         super().__init__()
         # Options
@@ -83,7 +83,7 @@ class DQNAgent():
         self.steps_trained = 0
         dummy_state = env.reset(subkey)
         dummy_obs = env.get_observation(dummy_state).astype(float)
-        V_net = hk.without_apply_rng(hk.transform(lambda obs: DQN_net(layer_spec)(obs.astype(float))))
+        V_net = hk.without_apply_rng(hk.transform(lambda obs: DQN_net(config,num_actions)(obs.astype(float))))
         
         self.params = V_net.init(subkey, dummy_obs)
         self.V_func = V_net.apply                #    V_func = V_function(config)
@@ -91,12 +91,11 @@ class DQNAgent():
         self.predict = lambda observations: self.V_func(self.params, observations)
         self.batched_predict = lambda observations: batch_func(self.V_func)(
             self.params, observations)
-
-        self.layer_spec = layer_spec
-
+        self.num_actions  = num_actions
         self.optim=optax.chain(
             optax.clip(1.0),
-            optax.sgd(learning_rate=self.lr)
+            optax.adamw(learning_rate=config.lr,eps=config.eps_adam, 
+                        b1=config.b1_adam, b2=config.b2_adam,weight_decay= config.wd_adam)
         )
         self.opt_state = self.optim.init(self.params)
     def act(self, observation, explore=True):
@@ -104,7 +103,7 @@ class DQNAgent():
         self.epsilon = (self.epsilon_decay ** self.steps_trained) * (
             self.epsilon_init - self.epsilon_min) + self.epsilon_min
         if explore and random.uniform(self.key) < self.epsilon:
-            action = random.randint(subkey, (), 0, self.layer_spec[-1])
+            action = random.randint(subkey, (), 0, self.num_actions)
         else:
             Q = self.V_func(self.params, observation)
             action = jnp.argmax(Q)
