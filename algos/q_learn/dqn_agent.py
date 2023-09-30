@@ -70,10 +70,10 @@ class ReplayBuffer:
     
 class DQNAgent():
     def __init__(self, num_actions=None,env=None,key=None,config=None, lr=0.001, epsilon_hlife=500, epsilon=1, epsilon_min=0.2,
-         buffer_size=1000000, discount_factor=0.90, seed=0, **kwargs,):
+         discount_factor=0.90, seed=0, **kwargs,):
         super().__init__()
         # Options
-        self.lr = lr; self.epsilon_init = epsilon;    self.buffer_size = buffer_size
+        self.lr = lr; self.epsilon_init = epsilon;    self.buffer_size = config.buffer_size
         self.discount_factor = discount_factor;   self.epsilon_min = epsilon_min
         self.epsilon_decay = 2 ** (-1 / epsilon_hlife)
         # Setup key for initilisation

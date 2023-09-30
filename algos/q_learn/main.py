@@ -73,16 +73,9 @@ def main(config: TrainConfig):
     # Create environment specified
     env = ProcMaze(grid_size=config.env_config.grid_size,
                    timeout=config.env_config.timeout)
-    
-    # Neural network spec
     key = jx.random.PRNGKey(config.seed)
     key, subkey = jx.random.split(key)
-    # dummy_state = env.reset(subkey)
-    # dummy_obs = env.get_observation(dummy_state).astype(float)
-    # observation_size = sum(dummy_obs.shape)
-    # print(dummy_obs.shape,">>>>>")  #(5,5,4)  (w,h,channle)
     num_actions = env.num_actions()
-    # layer_spec = [observation_size]+config.n_layers * [config.n_hidden_units] + [env.num_actions()]
     agent = DQNAgent(num_actions=num_actions,env=env,key=subkey,config=config, **vars(config))
     # Training
     agent = run(logger,env, agent,key=subkey, ep_steps=config.train_eps, **vars(config))

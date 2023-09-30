@@ -16,7 +16,7 @@ class TrainConfig:
     batch_size:int=256  #128
     discount:float=0.99
     num_simulations:int=3   #5
-    num_steps:int=900_000
+    num_steps:int=800_000
     ## network
     n_layers:int=3
     n_hidden_units:int=100   #200

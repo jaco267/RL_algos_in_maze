@@ -30,7 +30,7 @@ class TrainConfig:
     wd_adam:float=1e-6
     ## q-learn
     epsilon_hlife:int=1500 #epsilon greedy
-    dqnft_update_every:int=100
+    buffer_size:int = 1000_000
     ## plot
     avg_return_smoothing:float=0.9
     ## env
