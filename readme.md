@@ -1,3 +1,5 @@
+#### update 2023/11/1
+[Trajectory transformer](https://github.com/jannerm/trajectory-transformer) is implemented in [here](https://github.com/jaco267/Trajectory_Transformer_in_maze/tree/main)
 ###  RL-algos in Maze
 Compare the performance and training speed between Q-learning and Muzero in maze environment.       
 ### Conclusion
