@@ -1,7 +1,8 @@
-#### update 2023/11/1
-[Trajectory transformer](https://github.com/jannerm/trajectory-transformer) is implemented in [here](https://github.com/jaco267/Trajectory_Transformer_in_maze/tree/main)
 ###  RL-algos in Maze
 Compare the performance and training speed between Q-learning and Muzero in maze environment.       
+
+#### update 2023/11/1
+[Trajectory transformer](https://github.com/jannerm/trajectory-transformer) is implemented in [here](https://github.com/jaco267/Trajectory_Transformer_in_maze/tree/main)
 ### Conclusion
 Muzero learns pretty slow, but is more powerful, because you can increase the simulation budget to solve more difficult environment, with the cost of more training time.  (which (I guess) is the main reason why [mctx](https://github.com/google-deepmind/mctx) using jax instead of something like tensorflow or pytorch, because jax's xla will speed up the training time, and treemap is also convenient for building mcts)       
 ### acknowledge     
